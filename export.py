@@ -1,7 +1,7 @@
 import os
 import json
 import base64
-from markdown import markdown 
+from sideseeing_tools import sideseeing
 from datetime import datetime
 from bs4 import BeautifulSoup # web scrapping
 from jinja2 import Environment, FileSystemLoader, Template
@@ -58,9 +58,24 @@ class Report:
 
         return env.get_template(template_file_name)
     
-    def generate_report(self, template_path: Optional[str] = None) -> None:
+    def _process_dir_data(self, dir_path: str):
 
-        # ...
+        ds = sideseeing.SideSeeingDS(root_dir=dir_path)
+
+        datasets = []
+        for d in ds.iterator:
+            datasets.append(d)
+
+        sample = ds.instance
+        title = os.path.splitext(os.path.basename(dir_path))[0]
+
+    def _process_sensors_data():
+        pass
+
+    def generate_report(self, dir_path: str, template_path: Optional[str] = None) -> None:
+ 
+        print(f"Lendo o diretório: {dir_path}")
+        title, components = self._process_dir_data(dir_path)
 
         # Carregamos o template
         print("Carregando template...")
@@ -71,4 +86,10 @@ class Report:
             template = self._load_default_template()
             print(f"Usando template padrão: {self.default_template_path}")
 
-        # ...
+        context = {
+            "title": title,
+            "components": components,
+            "data_geracao": datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        }
+
+        html_output = template.render(context)
